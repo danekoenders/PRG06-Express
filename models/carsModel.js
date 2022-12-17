@@ -10,5 +10,14 @@ const carSchema = new Schema({
   options: String,
 });
 
+// Add vitual property to car, to include (dynamic) links
+carSchema.virtual('_links').get(
+  function () {
+    return {
+      
+    }
+  }
+)
+
 // Export function to create "SomeModel" model class
 module.exports = mongoose.model("Car", carSchema);

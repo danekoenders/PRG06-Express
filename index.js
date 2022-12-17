@@ -1,8 +1,12 @@
+// Require .env (Dotenv)
 require('dotenv').config();
 
+// Log URI
 console.log(process.env.BASE_URI);
 
+// Require Express
 const express = require("express");
+const bodyParser = require('body-parser');
 
 // Import the mongoose module
 const mongoose = require("mongoose");
@@ -20,10 +24,15 @@ db.on("error", console.error.bind(console, "MongoDB connection error:"));
 // Create Webserver
 const app = express();
 
+// Bodyparser middleware to parse x-from-www-urlencoded
+app.use(bodyParser.urlencoded({extended: true}));
+// Bodyparser middleware to parse json data
+app.use(bodyParser.json({ type: 'application/json' }));
+
 // Require carsRouter
 const carsRouter = require("./routers/carsRouter");
 
-// Create Route
+// Create Route for cars
 app.use("/cars/", carsRouter);
 
 // Start app on port 8000

@@ -1,18 +1,34 @@
-// Cars Router
 
+
+// Require Express
 const express = require("express");
 
 const router = express.Router();
 
 const Car = require("../models/carsModel");
 
-// Create Route
+// GET Route
 router.get("/", async (req, res) => {
     console.log("GET");
 
     try {
         let cars = await Car.find();
-        res.json(cars);
+
+        // Representation for the collection
+        let carsCollection = {
+            items: cars,
+            _links: {
+                self: {
+                    href: `${process.env.BASE_URI}cars/`
+                },
+                collection: {
+                    href: `${process.env.BASE_URI}cars/`
+                }
+            },
+            pagination: "Doen we een andere keer, maar er moet iets in staan."
+        }
+
+        res.json(carsCollection);
     } catch {
         res.status(500).send()
     }
@@ -24,20 +40,42 @@ router.get("/:id", (req, res) => {
     res.send(`request for car ${req.params.id}`);
 })
 
+// Middleware to check for headers for POST
+router.post("/", (req, res, next) => {
+    console.log("POST middleware to check Content-Type")
+
+    if (req.header("Content-Type") === "application/json") {
+        next();
+    } else {
+        res.status(400).send();
+    }
+})
+
+// Middleware to disallow empty values
+router.post("/", (req, res, next) => {
+    console.log("POST middleware to check empty values")
+
+    if (req.body.model && req.body.brand && req.body.options) {
+        next();
+    } else {
+        res.status(400).send();
+    }
+})
+
 // POST Route
 router.post("/", async (req, res) => {
-    let car = new Car({
-        model: "812 GTS",
-        brand: "Ferrari",
-        options: "Carbon Ceramic Brakes"
+    let car = Car({
+        model: req.body.model,
+        brand: req.body.brand,
+        options: req.body.options,
     })
 
     try {
         await car.save();
 
-        res.json(car);
+        res.status(201).send();
     } catch {
-        res.status(500).send()
+        res.status(500).send();
     }
 
     console.log("POST");
