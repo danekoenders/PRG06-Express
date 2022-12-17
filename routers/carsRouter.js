@@ -24,7 +24,9 @@ router.get("/", async (req, res) => {
                     href: `${process.env.BASE_URI}cars/`
                 }
             },
-            pagination: "Doen we een andere keer, maar er moet iets in staan."
+            pagination: {
+                temp: "Doen we een andere keer, maar er moet iets in staan."
+            }
         }
 
         res.json(carsCollection);
@@ -46,17 +48,6 @@ router.get("/:id", async (req, res) => {
     }
 
     // res.send(`request for car ${req.params.id}`);
-})
-
-// Middleware to check for headers for POST
-router.post("/", (req, res, next) => {
-    console.log("POST middleware to check Content-Type")
-
-    if (req.header("Content-Type") === "application/json") {
-        next();
-    } else {
-        res.status(400).send();
-    }
 })
 
 // Middleware to disallow empty values
