@@ -8,13 +8,18 @@ const carSchema = new Schema({
   model: String,
   brand: String,
   options: String,
-});
+}, { toJSON: {virtuals: true} });
 
 // Add vitual property to car, to include (dynamic) links
 carSchema.virtual('_links').get(
   function () {
     return {
-      
+      self: {
+        href: `${process.env.BASE_URI}cars/${this._id}`
+      },
+      collection: {
+        href: `${process.env.BASE_URI}cars/`
+      }
     }
   }
 )

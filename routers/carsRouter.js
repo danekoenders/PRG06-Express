@@ -13,7 +13,6 @@ router.get("/", async (req, res) => {
 
     try {
         let cars = await Car.find();
-
         // Representation for the collection
         let carsCollection = {
             items: cars,
@@ -30,14 +29,23 @@ router.get("/", async (req, res) => {
 
         res.json(carsCollection);
     } catch {
-        res.status(500).send()
+        res.status(500).send();
     }
 })
 
 // Create Route for detail
-router.get("/:id", (req, res) => {
+router.get("/:id", async (req, res) => {
     console.log("GET");
-    res.send(`request for car ${req.params.id}`);
+
+    try {
+        let car = await Car.find(this._id);
+
+        res.json(car);
+    } catch {
+        res.status(500).send();
+    }
+
+    // res.send(`request for car ${req.params.id}`);
 })
 
 // Middleware to check for headers for POST
