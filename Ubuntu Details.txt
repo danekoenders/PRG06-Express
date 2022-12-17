@@ -1,0 +1,3 @@
+ip: 145.24.222.181
+inlog: ubuntu-0993153
+wachtwoord: A88cFE
