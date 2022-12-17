@@ -70,6 +70,16 @@ router.post("/", (req, res, next) => {
     }
 })
 
+// Middleware checken content-type
+router.post("/", (req, res, next) => {
+
+    if (req.header("Content-Type") === "application/json") {
+        next();
+    } else {
+        res.status(415).send();
+    }
+})
+
 // POST Route
 router.post("/", async (req, res) => {
     let car = Car({
@@ -98,7 +108,9 @@ router.delete("/", (req, res) => {
 // OPTIONS Route
 router.options("/", (req, res) => {
     console.log("OPTIONS");
-    res.send("Response Correct");
+
+    res.setHeader("Allow", "GET, POST, OPTIONS")
+    res.send();
 })
 
 module.exports = router;
