@@ -11,6 +11,10 @@ const Car = require("../models/carsModel");
 router.get("/", async (req, res) => {
     console.log("GET");
 
+    if(req.header('Accept') != "application/json"){
+        res.status(415).send();
+    }
+
     try {
         let cars = await Car.find();
         // Representation for the collection
@@ -28,7 +32,10 @@ router.get("/", async (req, res) => {
                 temp: "Doen we een andere keer, maar er moet iets in staan."
             }
         }
-
+        
+        res.setHeader("Access-Control-Allow-Origin", '*');
+        res.setHeader("Access-Control-Allow-Headers", 'example-request');
+        res.setHeader("Access-Control-Allow-Method", 'GET, POST, OPTIONS');
         res.json(carsCollection);
     } catch {
         res.status(500).send();
@@ -36,18 +43,33 @@ router.get("/", async (req, res) => {
 })
 
 // Create Route for detail
-router.get("/:id", async (req, res) => {
-    console.log("GET");
+router.get("/:_id", async (req, res) => {
 
     try {
-        let car = await Car.find(this._id);
+        let car = await Car.findById(req.params._id)
+        if (car == null) {
+            res.status(404).send();
+        } else {
 
-        res.json(car);
+            res.setHeader("Access-Control-Allow-Origin", '*');
+            res.setHeader("Access-Control-Allow-Headers", 'example-request');
+            res.setHeader("Access-Control-Allow-Method", 'GET, PUT, DELETE, OPTIONS');
+            res.json(car)
+        }
+
     } catch {
-        res.status(500).send();
+        res.status(415).send();
     }
+})
 
-    // res.send(`request for car ${req.params.id}`);
+// Middleware checken content-type
+router.post("/", (req, res, next) => {
+
+    if (req.header("Content-Type") != "application/json" && req.header("Content-Type") != "application/x-www-form-urlencoded") {
+        res.status(400).send();
+    } else {
+        next();
+    }
 })
 
 // Middleware to disallow empty values
@@ -58,16 +80,6 @@ router.post("/", (req, res, next) => {
         next();
     } else {
         res.status(400).send();
-    }
-})
-
-// Middleware checken content-type
-router.post("/", (req, res, next) => {
-
-    if (req.header("Content-Type") === "application/json") {
-        next();
-    } else {
-        res.status(415).send();
     }
 })
 
@@ -90,18 +102,77 @@ router.post("/", async (req, res) => {
     console.log("POST");
 })
 
+// Middleware checking headers PUT
+router.put("/:_id", (req, res, next) => {
+    console.log("Middleware to check content type")
+
+    if (req.header("Content-Type") != "application/json" && req.header("Content-Type") != "application/x-www-form-urlencoded"){
+        
+        res.status(400).send();
+    } else {
+        next();
+    }
+})
+
+// Middleware checking empty values PUT
+router.put("/:_id", (req, res, next) => {
+    console.log("Middleware to check for empty values")
+
+    if (req.body.model && req.body.brand && req.body.options) {
+
+        next();
+    } else {
+        res.status(400).send();
+    }
+})
+
+// PUT Route
+router.put("/:_id", async (req, res) => {
+
+    let car = await Car.findOneAndUpdate(req.params,
+        {
+            title: req.body.model,
+            ingredients: req.body.brand,
+            sauce: req.body.options
+        })
+
+    try {
+        car.save();
+
+        res.status(200).send();
+    } catch {
+        res.status(500).send();
+    }
+})
+
 // DELETE Route
-router.delete("/", (req, res) => {
+router.delete("/:_id", async (req, res) => {
     console.log("DELETE");
-    res.send("Response Correct");
+
+    try {
+        await Car.findByIdAndDelete(req.params._id);
+
+        res.status(204).send();
+
+    } catch {
+        res.status(404).send();
+    }
 })
 
 // OPTIONS Route
 router.options("/", (req, res) => {
     console.log("OPTIONS");
 
-    res.setHeader("Allow", "GET, POST, OPTIONS")
+    res.setHeader("Allow", "GET, POST, OPTIONS");
     res.send();
+})
+
+// OPTIONS Route for details
+router.options("/:id", async (req, res) => {
+    console.log("OPTIONS (Details)");
+    
+    res.setHeader('Allow', 'GET, PUT, DELETE, OPTIONS')
+    res.send()
 })
 
 module.exports = router;
