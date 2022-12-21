@@ -131,9 +131,9 @@ router.put("/:_id", async (req, res) => {
 
     let car = await Car.findOneAndUpdate(req.params,
         {
-            title: req.body.model,
-            ingredients: req.body.brand,
-            sauce: req.body.options
+            model: req.body.model,
+            brand: req.body.brand,
+            options: req.body.options
         })
 
     try {

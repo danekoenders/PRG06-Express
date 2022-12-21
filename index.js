@@ -29,8 +29,12 @@ app.use(bodyParser.urlencoded({extended: true}));
 // Bodyparser middleware to parse json data
 app.use(bodyParser.json({ type: 'application/json' }));
 
+app.use(express.json());
+app.use(express.urlencoded({extended: false}));
+
 // Require carsRouter
 const carsRouter = require("./routers/carsRouter");
+const { json } = require('express');
 
 // Create Route for cars
 app.use("/cars/", carsRouter);
