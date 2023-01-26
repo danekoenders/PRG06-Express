@@ -21,8 +21,14 @@ const db = mongoose.connection;
 // Bind connection to error event (to get notification of connection errors)
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
+// CORS
+const cors = require('cors')
+
 // Create Webserver
 const app = express();
+
+// Use CORS
+app.use(cors());
 
 // Bodyparser middleware to parse x-from-www-urlencoded
 app.use(bodyParser.urlencoded({extended: true}));
